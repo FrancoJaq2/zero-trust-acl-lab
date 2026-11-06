@@ -40,14 +40,16 @@ Evitar que la red crítica de TI sea accesible desde la red de Ventas sin superv
 
 ### 1. Creación de la Lista de Control de Acceso (ACL Extendida)
 
-Se definió una regla estricta que bloquea todo el tráfico IP proveniente del bloque de Ventas con destino al bloque de TI, permitiendo el resto del tráfico saliente:
+Se definió una regla estricta que bloquea el tráfico del bloque de Ventas hacia TI y, por defecto, deniega todo lo demás. A diferencia de una configuración tradicional, aquí no hay un permit any any al final; aplicamos el principio de menor privilegio, donde solo el tráfico explícitamente permitido fluye:
 
 ```
 ! Definición de la ACL 100
 enable
 configure terminal
+! Bloqueo explícito del tráfico de Ventas hacia TI
 access-list 100 deny ip 192.168.50.0 0.0.0.127 192.168.50.128 0.0.0.127
-access-list 100 permit ip any any
+! Denegar todo lo demás por defecto (Zero Trust)
+access-list 100 deny ip any any
 ```
 
 Se aplicó la lista en la interfaz GigabitEthernet0/0/0 (puerta de entrada de Ventas) para interceptar el tráfico en el punto de origen:
